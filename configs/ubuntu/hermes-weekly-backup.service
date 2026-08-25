@@ -1,0 +1,25 @@
+[Unit]
+Description=Hermes weekly core-data backup to ECS
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=<VM_USER>
+Group=<VM_GROUP>
+Environment=HOME=/home/<VM_USER>
+EnvironmentFile=/etc/hermes-backup.conf
+WorkingDirectory=/home/<VM_USER>
+ExecStart=/home/<VM_USER>/.local/bin/hermes-weekly-backup
+UMask=0077
+TimeoutStartSec=30min
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/tmp
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.example.hermes-ubuntu-vm</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Applications/VirtualBox.app/Contents/MacOS/VBoxHeadless</string>
+    <string>--startvm</string>
+    <string>hermes-ubuntu</string>
+    <string>--vrde</string>
+    <string>off</string>
+  </array>
+  <key>UserName</key><string>&lt;MAC_USER&gt;</string>
+  <key>GroupName</key><string>staff</string>
+  <key>WorkingDirectory</key><string>/Users/&lt;MAC_USER&gt;</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key><string>/Users/&lt;MAC_USER&gt;</string>
+    <key>USER</key><string>&lt;MAC_USER&gt;</string>
+    <key>LOGNAME</key><string>&lt;MAC_USER&gt;</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>StandardOutPath</key><string>/Users/&lt;MAC_USER&gt;/Library/Logs/hermes-ubuntu-vm.log</string>
+  <key>StandardErrorPath</key><string>/Users/&lt;MAC_USER&gt;/Library/Logs/hermes-ubuntu-vm.err.log</string>
+</dict>
+</plist>
+

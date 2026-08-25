@@ -1,0 +1,7 @@
+# Install as /etc/hermes-backup.conf with mode 0600.
+BACKUP_HOST=<ECS_PUBLIC_HOST_OR_IP>
+BACKUP_PORT=<DEDICATED_SSH_PORT>
+BACKUP_USER=<BACKUP_USER>
+BACKUP_KEY=/home/<VM_USER>/.ssh/hermes-weekly-backup
+HERMES_ROOT=/home/<VM_USER>/.hermes
+

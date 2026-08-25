@@ -1,0 +1,40 @@
+Port <DEDICATED_SSH_PORT>
+AddressFamily any
+ListenAddress 0.0.0.0
+ListenAddress ::
+PidFile /run/sshd-hermes-tunnel.pid
+HostKey /etc/ssh/ssh_host_ed25519_key
+AuthorizedKeysFile .ssh/authorized_keys
+StrictModes yes
+AllowUsers <TUNNEL_USER> <BACKUP_USER>
+PermitRootLogin no
+PubkeyAuthentication yes
+AuthenticationMethods publickey
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+UsePAM no
+AllowAgentForwarding no
+AllowTcpForwarding no
+GatewayPorts no
+X11Forwarding no
+PermitTTY no
+PermitUserEnvironment no
+PermitTunnel no
+MaxSessions 1
+LoginGraceTime 30
+MaxAuthTries 3
+ClientAliveInterval 60
+ClientAliveCountMax 3
+LogLevel VERBOSE
+
+Match User <TUNNEL_USER>
+    AllowTcpForwarding remote
+    PermitListen 127.0.0.1:<ECS_LOOPBACK_PORT>
+    MaxSessions 0
+
+Match User <BACKUP_USER>
+    AllowTcpForwarding no
+    MaxSessions 1
+    ForceCommand /usr/local/sbin/hermes-backup-receive
+
