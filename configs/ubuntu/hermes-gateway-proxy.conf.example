@@ -1,0 +1,10 @@
+# Install as /etc/systemd/system/hermes-gateway.service.d/proxy.conf.
+# This points Hermes at the Ubuntu-local Mihomo listener, not at the Mac port.
+
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:<MIHOMO_PORT>"
+Environment="HTTPS_PROXY=http://127.0.0.1:<MIHOMO_PORT>"
+Environment="http_proxy=http://127.0.0.1:<MIHOMO_PORT>"
+Environment="https_proxy=http://127.0.0.1:<MIHOMO_PORT>"
+Environment="NO_PROXY=127.0.0.1,localhost"
+Environment="no_proxy=127.0.0.1,localhost"

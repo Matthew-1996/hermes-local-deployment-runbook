@@ -1,0 +1,58 @@
+# Merge these fields into ~/.hermes/config.yaml; do not replace the full file.
+# ChatGPT OAuth lives in ~/.hermes/auth.json and DeepSeek credentials live in
+# ~/.hermes/.env. Neither file belongs in Git.
+
+model:
+  default: gpt-5.6-sol
+  provider: openai-codex
+  base_url: https://chatgpt.com/backend-api/codex
+
+agent:
+  reasoning_effort: medium
+
+fallback_providers:
+  - provider: deepseek
+    model: deepseek-v4-flash-vision-exp
+    base_url: https://api.deepseek.com/v1
+
+auxiliary:
+  web_extract:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  compression:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  skills_hub:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  approval:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  mcp:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  title_generation:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  triage_specifier:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  profile_describer:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  goal_judge:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max
+  monitor:
+    provider: openai-codex
+    model: gpt-5.6-luna
+    reasoning_effort: max

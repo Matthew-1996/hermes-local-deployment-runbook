@@ -27,10 +27,8 @@ trap 'rm -rf "$stage"; rm -f "$archive"' EXIT
 mkdir -p "$stage/hermes"
 
 core_items=(
-  .env
   config.yaml
   SOUL.md
-  auth.json
   channel_directory.json
   gateway_state.json
   feishu_seen_message_ids.json
@@ -78,10 +76,10 @@ sqlite_backup "$hermes_root/kanban.db" "$stage/hermes/kanban.db"
 sqlite_backup "$hermes_root/cron/executions.db" "$stage/hermes/cron/executions.db"
 
 cat > "$stage/README.txt" <<EOF
-Hermes core-data backup
+Hermes core-data backup (credentials excluded)
 Created: $(date --iso-8601=seconds)
-Includes configuration, credentials, persona, memories, skills, sessions, cron state, pairing/platform state, and consistent SQLite snapshots.
-Excludes reinstallable runtime, venv, Node.js, browser cache, local STT models, logs, and transient caches.
+Includes non-credential configuration, persona, memories, skills, sessions, cron state, pairing/platform state, and consistent SQLite snapshots.
+Excludes .env, auth.json, reinstallable runtime, venv, Node.js, browser cache, local STT models, logs, and transient caches.
 EOF
 
 tar -C "$stage" -czf "$archive" README.txt hermes
@@ -98,4 +96,3 @@ reply=$(ssh -i "$BACKUP_KEY" \
 
 printf '%s\n' "$reply"
 printf 'LOCAL_ARCHIVE_BYTES=%s\n' "$(stat -c %s "$archive")"
-

@@ -8,6 +8,8 @@
 - 运行 VirtualBox
 - 通过 LaunchDaemon 自动启动 Ubuntu VM
 - 主动连接 ECS，维持反向 SSH 隧道
+- 运行用户选择的本地代理客户端
+- 通过独立 LaunchDaemon 把本地代理端口反向转发到 Ubuntu 回环地址
 - 不直接运行 Hermes 主服务
 
 ### Ubuntu 虚拟机
@@ -16,6 +18,8 @@
 - 保存 Hermes 人格、记忆、Skills、会话与平台配置
 - 运行 Playwright Chromium 和本地语音识别
 - 通过 systemd 在开机后自动启动 Gateway
+- 运行本地 Mihomo，仅把 OpenAI/Codex 域名送入受控故障组
+- 首选复用 Mac 本地代理，失败时切换到脱敏配置中的独立备用节点
 - 每周主动向 ECS 发送核心数据备份
 
 ### 阿里云 ECS
@@ -38,6 +42,20 @@ Mac 开机
 ```
 
 网络中断时，SSH 的 KeepAlive 与 LaunchDaemon KeepAlive 负责重新建立隧道。VM 或 Ubuntu 服务异常时，分别由 VirtualBox/LaunchDaemon 与 systemd 恢复。
+
+模型与代理链路独立于远程运维链路：
+
+```text
+Hermes Gateway
+  -> Ubuntu Mihomo
+       -> 首选：Ubuntu 回环代理端口
+            -> SSH remote forward
+                 -> Mac 本地代理端口
+                      -> OpenAI/Codex
+       -> 备用：Ubuntu 订阅中的最小候选节点集合
+```
+
+Hermes 自身另有模型级故障链：Codex 主模型发生限流、5xx、认证或连接错误时，尝试 DeepSeek。代理故障组和模型故障链是两层不同机制，不能互相替代。
 
 ## 3. 远程维护路径
 
@@ -71,4 +89,3 @@ Mac 开机
 - 不并发运行多个重型浏览器任务
 - STT 模型设置空闲卸载
 - 定期检查 VM 磁盘、内存与 OOM 日志
-

@@ -5,6 +5,8 @@
 - 旧 Intel Mac 作为 7×24 小时宿主机
 - VirtualBox 中的 Ubuntu 24.04 LTS 作为唯一主运行环境
 - 微信与飞书消息统一接入本地 Hermes Gateway
+- ChatGPT Codex 订阅作为主模型，DeepSeek 作为跨提供商故障备用
+- Ubuntu 通过受管 SSH 隧道复用 macOS 上的本地代理
 - 阿里云 ECS 仅作为远程运维中转与异机备份节点
 - 每周自动备份 Hermes 的人格、记忆、Skills、会话、任务和配置
 
@@ -15,7 +17,10 @@
 ```mermaid
 flowchart LR
     U[微信 / 飞书 / CLI] --> G[Ubuntu VM\nHermes Gateway]
-    G --> API[模型与工具 API]
+    G --> P[Ubuntu 本地代理与故障组]
+    P -->|首选| MP[Mac 本地代理]
+    P -->|备用| API[独立模型 API 出口]
+    MP --> API
     M[旧 Intel Mac\nmacOS 宿主机] --> V[VirtualBox\nUbuntu 24.04]
     V --> G
     V -->|每周受限 SSH 备份| C[阿里云 ECS\n中转与备份]
@@ -38,8 +43,11 @@ flowchart LR
 | 路径 | 用途 |
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | 三层架构、启动链路和故障边界 |
+| [`docs/gpt-hermes-deployment.md`](docs/gpt-hermes-deployment.md) | 从 Ubuntu 基线到 GPT/Codex、Gateway 与生产验收的完整实施步骤 |
 | [`docs/migration-runbook.md`](docs/migration-runbook.md) | 从云端迁移到本地唯一主节点的执行顺序 |
 | [`docs/operations.md`](docs/operations.md) | 日常检查、启停、故障定位与切换规则 |
+| [`docs/models-and-proxy.md`](docs/models-and-proxy.md) | Sol/Luna/DeepSeek 模型路由与 Mac 代理复用方案 |
+| [`docs/qa-and-troubleshooting.md`](docs/qa-and-troubleshooting.md) | 本次真实部署遇到的 QA、症状判断与恢复方法 |
 | [`docs/backup-and-restore.md`](docs/backup-and-restore.md) | 备份范围、保留策略、验证与恢复流程 |
 | [`docs/security.md`](docs/security.md) | 凭证、网络暴露、双实例与 GitHub 安全边界 |
 | [`docs/hermes-context-prompt.md`](docs/hermes-context-prompt.md) | 可直接同步给 Hermes 的长期环境 Prompt |
@@ -67,15 +75,21 @@ flowchart LR
 3. 在 Ubuntu 安装 Hermes、消息依赖、浏览器与本地 STT。
 4. 迁移并校验 Hermes 核心数据。
 5. 将本地 Gateway 设为 systemd 系统服务并完成微信、飞书验收。
-6. 停用云端 Gateway，确认不存在双实例竞争。
-7. 配置受限备份账号、每周 Timer 和轮换策略。
-8. 删除迁移期临时密钥，执行最终安全检查。
+6. 配置 Codex 订阅、辅助模型与跨提供商故障备用。
+7. 通过 Mac 本地代理隧道验证 OpenAI Auth 与 Codex 端点。
+8. 停用云端 Gateway，确认不存在双实例竞争。
+9. 配置受限备份账号、每周 Timer 和轮换策略。
+10. 删除迁移期临时密钥，执行最终安全检查。
+
+首次实施建议严格按 [`docs/gpt-hermes-deployment.md`](docs/gpt-hermes-deployment.md) 的阶段门执行：上一阶段未通过，不叠加下一层功能。
 
 ## 验收标准
 
 - Mac 重启后，反向隧道和 Ubuntu VM 自动恢复。
 - Ubuntu 启动后，Hermes Gateway 自动在线。
 - 微信和飞书均能收到最终回复。
+- Codex 主模型完成真实调用，代理端点返回预期 HTTP 状态。
+- Mac 代理不可用时，Hermes 和代理层均存在独立的可审计备用路径。
 - 云端 Gateway 为 inactive，只有本地 Gateway active。
 - 浏览器截图与中文语音识别测试通过。
 - 手动备份能生成可解压、SHA-256 正确的归档。

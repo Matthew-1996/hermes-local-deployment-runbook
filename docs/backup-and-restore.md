@@ -6,13 +6,14 @@
 
 包含：
 
-- `.env`、`config.yaml`、`auth.json`
+- `config.yaml`（发布或分享前仍须检查其中是否意外包含内联凭据）
 - `SOUL.md`、`MEMORY.md`、`USER.md`
 - Skills、会话、Cron、配对和平台状态
 - `state.db`、`kanban.db`、`cron/executions.db` 的 SQLite 在线一致性快照
 
 排除：
 
+- `.env`、`auth.json` 与其他独立凭据文件
 - Hermes 源码、Python 虚拟环境
 - Node.js 和 Playwright 浏览器缓存
 - 本地 STT 模型
@@ -74,5 +75,6 @@ tar -tzf "$latest" | sed -n '1,40p'
 
 ## 凭证风险
 
-备份包含平台凭证和 API 配置。当前链路通过 SSH 加密传输，归档在 ECS 上依靠专用账号与 `0600` 权限保护，但归档本身没有二次加密。需要更强保护时，可在发送前用 `age` 或等效工具加密，并把解密密钥放在 ECS 之外。
+当前模板主动排除 `.env` 和 `auth.json`，因此 ChatGPT OAuth、模型 API Key 和大部分平台密钥不会进入 ECS 归档。恢复后必须在目标机上通过受控渠道重新配置这些凭据。
 
+`config.yaml`、平台状态目录或未来版本仍可能新增敏感字段。升级 Hermes 后应重新审计备份清单；若业务要求备份凭据，必须先用 `age` 或等效工具在 Ubuntu 端加密，并把解密密钥放在 ECS 之外。

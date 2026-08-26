@@ -3,6 +3,7 @@
 ## 必须遵守
 
 - 不把 `.env`、`auth.json`、私钥或真实备份归档提交到 Git。
+- 不提交 ChatGPT OAuth 设备授权结果、代理订阅 URL、节点服务器、密码或证书字段。
 - 不在命令行参数中传递密码、Token 或 API Key。
 - 不公开 ECS 公网 IP、实例 ID、用户名、平台用户 ID、群 ID 或主机指纹。
 - 不直接把 Mac SSH、Ubuntu SSH 或 Hermes 管理端口暴露到公网。
@@ -31,6 +32,7 @@ git grep -nEI '([0-9]{1,3}\.){3}[0-9]{1,3}|sk-[A-Za-z0-9_-]+|BEGIN (OPENSSH|RSA|
 - `.DS_Store`、终端截图、日志与命令历史
 - `*.pem`、`*.key`、`id_*`、`authorized_keys`
 - 备份压缩包、SQLite 数据库和 `.env*`
+- Mihomo/CuteCloud 导出的真实订阅与节点配置
 - 文档中复制的真实路径、IP、指纹和账号 ID
 
 ## GitHub 仓库建议
@@ -39,4 +41,3 @@ git grep -nEI '([0-9]{1,3}\.){3}[0-9]{1,3}|sk-[A-Za-z0-9_-]+|BEGIN (OPENSSH|RSA|
 - 启用 Secret Scanning 和 Push Protection（如账户方案支持）。
 - 提交只包含模板与文档，不包含机器导出的真实配置。
 - 需要分享时先审阅历史提交，而不只是当前工作树。
-

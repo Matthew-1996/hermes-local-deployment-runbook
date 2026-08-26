@@ -1,0 +1,27 @@
+# Merge this fragment into the real Mihomo config. It is not standalone.
+# Never commit the subscription URL, node servers, passwords, UUIDs, or certs.
+
+proxies:
+  - name: MAC-LOCAL-PROXY
+    type: http
+    server: 127.0.0.1
+    port: <GUEST_PROXY_PORT>
+
+proxy-groups:
+  - name: CODEX
+    type: fallback
+    proxies:
+      - MAC-LOCAL-PROXY
+      - <FALLBACK_NODE_1>
+      - <FALLBACK_NODE_2>
+    url: https://chatgpt.com/backend-api/codex
+    expected-status: 200-499
+    interval: 180
+    lazy: true
+    timeout: 15000
+    max-failed-times: 2
+
+rules:
+  - DOMAIN-SUFFIX,openai.com,CODEX
+  - DOMAIN-SUFFIX,chatgpt.com,CODEX
+  - MATCH,DIRECT
