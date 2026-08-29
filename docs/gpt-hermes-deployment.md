@@ -155,8 +155,8 @@ ss -lnt | grep ':<GUEST_PROXY_PORT> '
 
 Mihomo 只监听 Ubuntu 回环地址，配置分两层：
 
-1. `MAC-LOCAL-PROXY`：HTTP 代理指向 SSH remote-forward 端口。
-2. `CODEX` fallback：Mac 代理优先，最小数量的本机备用节点随后。
+1. `MAC-SHADOWROCKET`：HTTP 代理指向 SSH remote-forward 端口。
+2. `CODEX` fallback：Mac 代理优先；只有通过“两地区、每区至少两节点”真实端点验收后，才追加地区备用组。
 
 合并 [`mihomo-codex-proxy.yaml.example`](../configs/ubuntu/mihomo-codex-proxy.yaml.example) 后：
 
@@ -167,7 +167,7 @@ sudo systemctl restart mihomo.service
 systemctl is-active mihomo.service
 ```
 
-生产配置修改必须使用“备份 → 离线校验 → 原子安装 → 重启 → 双端点测试 → 失败回滚”顺序。临时 probe 使用独立端口，结束后清理进程，避免端口占用导致假失败。
+生产配置修改必须使用“备份 → 离线校验 → 原子安装 → 重启 → 双端点测试 → 失败回滚”顺序。临时 probe 使用独立端口，结束后清理进程，避免端口占用导致假失败。当前两地区门槛尚未通过，所以地区备用组没有安装。
 
 ## 7. 验证 OpenAI/Codex 网络
 

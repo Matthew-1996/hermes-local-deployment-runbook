@@ -19,7 +19,7 @@
 - 运行 Playwright Chromium 和本地语音识别
 - 通过 systemd 在开机后自动启动 Gateway
 - 运行本地 Mihomo，仅把 OpenAI/Codex 域名送入受控故障组
-- 首选复用 Mac 本地代理，失败时切换到脱敏配置中的独立备用节点
+- 首选复用 Mac Shadowrocket；独立地区备用组必须通过真实端点门槛后才能启用
 - 每周主动向 ECS 发送核心数据备份
 
 ### 阿里云 ECS
@@ -52,10 +52,12 @@ Hermes Gateway
             -> SSH remote forward
                  -> Mac 本地代理端口
                       -> OpenAI/Codex
-       -> 备用：Ubuntu 订阅中的最小候选节点集合
+       -> 候选备用：两个通过验收的地区组（当前未上线）
 ```
 
 Hermes 自身另有模型级故障链：Codex 主模型发生限流、5xx、认证或连接错误时，尝试 DeepSeek。代理故障组和模型故障链是两层不同机制，不能互相替代。
+
+当前生产只验收了 Mac Shadowrocket 主路径。Ubuntu 地区备用组的实现存在，但最新受控探测未满足“两地区、每区至少两节点”的门槛，因此生产配置未启用该能力。
 
 ## 3. 远程维护路径
 

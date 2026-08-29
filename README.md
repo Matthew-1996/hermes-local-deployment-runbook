@@ -38,6 +38,8 @@ flowchart LR
 4. 备份账号使用强制命令，不能获取 Shell、TTY 或端口转发。
 5. 任何凭证只保存在受限配置文件中，不进入 Git。
 
+当前生产状态（2026-08-29）：Shadowrocket 经受管 SSH 隧道是已验收的首选网络路径，Codex 端点和 Hermes 真实 GPT 调用均已恢复。Ubuntu 独立节点的“两地区备用组”仍是候选能力：51 个订阅节点的受控实测只得到韩国 2 个、日本 1 个同时通过 Auth 与 Codex，未满足“2 个地区且每区至少 2 个可用节点”的上线门槛，因此没有安装候选配置，生产配置已恢复原样。
+
 ## 仓库内容
 
 | 路径 | 用途 |
@@ -52,7 +54,9 @@ flowchart LR
 | [`docs/security.md`](docs/security.md) | 凭证、网络暴露、双实例与 GitHub 安全边界 |
 | [`docs/hermes-context-prompt.md`](docs/hermes-context-prompt.md) | 可直接同步给 Hermes 的长期环境 Prompt |
 | [`scripts/guest/hermes-core-backup.sh`](scripts/guest/hermes-core-backup.sh) | Ubuntu 侧一致性核心数据备份脚本模板 |
+| [`scripts/guest/mihomo_refresh_fallbacks.py`](scripts/guest/mihomo_refresh_fallbacks.py) | 隔离/受控线上探测、地区分组与失败恢复工具 |
 | [`scripts/cloud/hermes-backup-receive.sh`](scripts/cloud/hermes-backup-receive.sh) | ECS 侧接收、校验与动态保留脚本模板 |
+| [`tests/test_mihomo_refresh_fallbacks.py`](tests/test_mihomo_refresh_fallbacks.py) | 代理探测、筛选、配置事务与恢复行为回归测试 |
 | [`configs/`](configs/) | systemd、sshd 与 macOS LaunchDaemon 示例 |
 
 ## 参考资源配置
@@ -89,7 +93,7 @@ flowchart LR
 - Ubuntu 启动后，Hermes Gateway 自动在线。
 - 微信和飞书均能收到最终回复。
 - Codex 主模型完成真实调用，代理端点返回预期 HTTP 状态。
-- Mac 代理不可用时，Hermes 和代理层均存在独立的可审计备用路径。
+- Hermes 已配置 DeepSeek 跨提供商备用；代理层独立备用只有在两个地区均通过真实端点门槛后才可上线，当前不得把候选脚本视为已验收冗余。
 - 云端 Gateway 为 inactive，只有本地 Gateway active。
 - 浏览器截图与中文语音识别测试通过。
 - 手动备份能生成可解压、SHA-256 正确的归档。

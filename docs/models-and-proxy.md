@@ -53,12 +53,12 @@ systemctl is-active hermes-gateway.service
 Hermes/OpenAI client
   -> Ubuntu Mihomo loopback port
        -> CODEX fallback group
-            1. MAC-LOCAL-PROXY
+            1. MAC-SHADOWROCKET
                -> Ubuntu loopback remote-forward port
                -> SSH connection to Mac host
                -> Mac local proxy loopback port
-            2. <FALLBACK_NODE_1>
-            3. <FALLBACK_NODE_2>
+            2. CODEX-REGION-A（候选，未上线）
+            3. CODEX-REGION-B（候选，未上线）
 ```
 
 关键边界：
@@ -66,7 +66,7 @@ Hermes/OpenAI client
 - Mac 客户端可以保持规则或智能选择模式；Ubuntu 继承它对 OpenAI/Codex 域名的实际选择。
 - Ubuntu 只能观察出口国家、HTTP 状态和时延，不能可靠获知 Mac 客户端内部节点名称。
 - SSH 隧道只绑定两端回环地址，不向局域网或公网开放代理。
-- Ubuntu 独立备用节点只写在本机真实配置中，仓库仅使用占位符。
+- Ubuntu 独立备用节点只写在本机真实配置中，仓库仅使用地区与节点占位符。
 
 ## 4. Mac 到 Ubuntu 的代理隧道
 
@@ -88,13 +88,26 @@ Hermes/OpenAI client
 
 参考 [`configs/ubuntu/mihomo-codex-proxy.yaml.example`](../configs/ubuntu/mihomo-codex-proxy.yaml.example)。示例是合并片段，不是完整订阅：
 
-- `MAC-LOCAL-PROXY` 为首选。
-- 两个占位备用节点必须已存在于本机 `proxies` 或 provider 中。
+- `MAC-SHADOWROCKET` 为首选。
+- 每个地区组只纳入同时通过 Auth 与 Codex 的节点，并且至少有 2 个节点。
+- 必须同时存在 2 个合格地区；任何一个地区不达标都不安装候选配置。
 - 使用真实 Codex HTTPS URL 做健康检查。
 - `expected-status: 200-499` 接受未认证探测的 `403`。
 - `lazy: true` 避免无 Codex 流量时持续测速。
 
 修改生产配置时必须先备份、离线校验、重启服务、执行 Auth/Codex 双端点测试；任何阶段失败都回滚。
+
+### 当前验收结论
+
+2026-08-29 对最新订阅执行了受控线上探测。探测期间临时停止 Gateway、替换 Mihomo 配置，结束后无论成功或失败都恢复原配置并重新启动服务：
+
+- 51 个真实节点参与测试。
+- 3 个节点同时通过 Device Auth POST 与 Codex HTTPS：韩国 2 个、日本 1 个。
+- 韩国满足每区 2 个节点，日本不满足；最终只有 1 个合格地区。
+- 两地区上线门槛未通过，候选配置未安装。
+- 恢复后 Mihomo、Gateway active，生产 Codex 端点返回预期 `403`。
+
+因此当前“Mac Shadowrocket 首选”是已验收生产路径；“Ubuntu 两地区备用”只是已实现、可重复运行的评估工具，不是当前生产保障。工具位于 [`scripts/guest/mihomo_refresh_fallbacks.py`](../scripts/guest/mihomo_refresh_fallbacks.py)。订阅 URL 必须在交互提示中输入，不得写入命令、仓库或日志。
 
 ## 6. 延迟基线
 

@@ -2,18 +2,42 @@
 # Never commit the subscription URL, node servers, passwords, UUIDs, or certs.
 
 proxies:
-  - name: MAC-LOCAL-PROXY
+  - name: MAC-SHADOWROCKET
     type: http
     server: 127.0.0.1
     port: <GUEST_PROXY_PORT>
 
 proxy-groups:
+  # Do not enable either regional group until every listed node passes both
+  # OpenAI Device Auth and Codex checks, with at least two nodes per region.
+  - name: CODEX-REGION-A
+    type: url-test
+    proxies:
+      - <REGION_A_NODE_1>
+      - <REGION_A_NODE_2>
+    url: https://chatgpt.com/backend-api/codex
+    expected-status: 200-499
+    interval: 180
+    lazy: true
+    tolerance: 150
+
+  - name: CODEX-REGION-B
+    type: url-test
+    proxies:
+      - <REGION_B_NODE_1>
+      - <REGION_B_NODE_2>
+    url: https://chatgpt.com/backend-api/codex
+    expected-status: 200-499
+    interval: 180
+    lazy: true
+    tolerance: 150
+
   - name: CODEX
     type: fallback
     proxies:
-      - MAC-LOCAL-PROXY
-      - <FALLBACK_NODE_1>
-      - <FALLBACK_NODE_2>
+      - MAC-SHADOWROCKET
+      - CODEX-REGION-A
+      - CODEX-REGION-B
     url: https://chatgpt.com/backend-api/codex
     expected-status: 200-499
     interval: 180

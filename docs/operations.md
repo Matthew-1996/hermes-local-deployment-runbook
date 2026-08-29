@@ -67,6 +67,44 @@ timeout 180 hermes -z "仅回复：主模型调用成功"
 
 完成配置后还必须在至少一个生产消息渠道发送测试消息。CLI 成功不能替代 Gateway 和渠道验收。
 
+## 受控评估 Ubuntu 地区备用组
+
+该操作会短暂停止 Gateway 并重启 Mihomo，只能在维护窗口执行。当前生产尚未验收“两地区备用组”；Shadowrocket 隧道仍是正式网络路径。
+
+前置条件：
+
+- Ubuntu `127.0.0.1:<GUEST_PROXY_PORT>` 的 Shadowrocket 恢复路径同时通过 Auth 与 Codex。
+- 运维账号只拥有 Gateway stop/start 与 Mihomo restart 的精确免密权限；sudoers 已用 `visudo -cf` 校验并做过真实操作测试。
+- 已保存生产 `config.yaml` 的 SHA-256。
+
+运行：
+
+```bash
+cd "$HOME/.hermes/hermes-agent"
+venv/bin/python \
+  "$HOME/.local/lib/hermes-tools/mihomo_refresh_fallbacks.py" \
+  live-probe \
+  --confirm-live \
+  --rounds 2 \
+  --regions 2 \
+  --min-region-nodes 2
+```
+
+订阅 URL 只在隐藏提示中输入。通过条件是 2 个地区、每区至少 2 个节点在两轮真实 Auth/Codex 测试中均可用。条件不满足时不安装候选配置；脚本必须恢复生产配置，随后人工确认：
+
+```bash
+sha256sum -c /tmp/mihomo-production-before.sha256
+systemctl is-active mihomo.service
+systemctl is-active hermes-gateway.service
+curl -4 -sS -o /dev/null \
+  --proxy http://127.0.0.1:<MIHOMO_PORT> \
+  --connect-timeout 15 --max-time 30 \
+  -w 'HTTP=%{http_code} TOTAL=%{time_total}s\n' \
+  https://chatgpt.com/backend-api/codex
+```
+
+最后还要执行一次 Hermes 真实 GPT 调用。仅看到 `LIVE_CANDIDATE_VALIDATION=OK` 不代表备用组通过，也不代表候选配置已安装。
+
 ## 远程登录
 
 从 ECS 登录 Mac：
