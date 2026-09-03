@@ -1,5 +1,7 @@
 # Hermes Local Deployment Runbook
 
+![Hermes 本地部署运行手册：唯一主节点、受管代理与异机备份](docs/assets/readme/hermes-runbook-hero.svg)
+
 一套经过实际迁移与端到端验证的个人 Hermes Agent 部署方案：
 
 - 旧 Intel Mac 作为 7×24 小时宿主机
@@ -13,6 +15,12 @@
 本仓库只保存可复用的架构、模板和操作手册。真实 IP、用户名、密钥、Token、密码、账号 ID 与备份文件均不得提交。
 
 ## 当前架构
+
+![Hermes 本地部署的消息、模型、远程运维与备份拓扑](docs/assets/readme/hermes-topology.svg)
+
+<details>
+<summary>查看可编辑 Mermaid 源图</summary>
+
 
 ```mermaid
 flowchart LR
@@ -29,6 +37,8 @@ flowchart LR
     C -->|ECS 回环端口| M
     M -->|NAT 回环端口| V
 ```
+
+</details>
 
 核心原则：
 
@@ -73,6 +83,10 @@ flowchart LR
 这是低成本可用配置，不是高并发配置。浏览器、语音识别和多个长任务并发时需要关注内存峰值。
 
 ## 部署顺序
+
+![Hermes 从宿主机到最终验收的六个部署阶段门](docs/assets/readme/hermes-stage-gates.svg)
+
+上一阶段的服务、真实调用与恢复证据未通过，就不叠加下一层功能。
 
 1. 配置 Mac 远程登录、电源策略和反向 SSH 隧道。
 2. 安装 VirtualBox 与 Ubuntu Server VM，配置 NAT SSH 转发。
